@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Earshot
 
-## Getting Started
+Spotify listening stats: an all-time dashboard built from your Spotify data export, plus a live
+"current rotation" view through the Spotify Web API.
 
-First, run the development server:
+## Run it
 
 ```bash
+npm install
+cp .env.example .env.local   # then fill in SPOTIFY_CLIENT_ID
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open **http://127.0.0.1:3000**. Spotify doesn't accept `localhost` redirect URIs, so `localhost` requests get
+redirected to `127.0.0.1` automatically.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## All-time history (`/history`)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. spotify.com → Account → Privacy settings → request **Extended streaming history**.
+2. When the email arrives, unzip it and drop the `Streaming_History_Audio_*.json` files onto the page.
 
-## Learn More
+Files are parsed in the browser and stored in IndexedDB. Nothing is uploaded. The basic account data export
+(`StreamingHistory_music_*.json`) works too, but only covers about a year and has no skip info.
 
-To learn more about Next.js, take a look at the following resources:
+## Live view (`/now`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Create an app at https://developer.spotify.com/dashboard (select "Web API").
+2. Add the Redirect URI `http://127.0.0.1:3000/api/auth/callback`.
+3. Put the Client ID in `.env.local`. The app uses PKCE, so it doesn't need a client secret.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+While the Spotify app is in Development Mode, only accounts listed under **User Management** can log in.
