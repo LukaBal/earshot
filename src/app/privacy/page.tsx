@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import { SectionTitle } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Privacy" };
 
 export default function PrivacyPage() {
   return (
-    <article className="mx-auto max-w-2xl space-y-6 text-muted">
-      <h1 className="font-display text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">Privacy</h1>
+    <article className="max-w-2xl space-y-8 leading-relaxed">
+      <SectionTitle as="h1" title="Privacy" note="Short version: nothing leaves your device" />
 
       <section className="space-y-2">
-        <h2 className="font-display text-lg font-bold text-foreground">Your history files</h2>
+        <h2 className="caps text-sm text-accent-bright">Your history files</h2>
         <p>
           Files you add on the All-time page are read by your own browser and saved in its local storage (IndexedDB)
           so your stats survive a reload. They are never uploaded to Earshot or anyone else. &ldquo;Clear data&rdquo;
@@ -17,7 +18,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="font-display text-lg font-bold text-foreground">Connecting Spotify</h2>
+        <h2 className="caps text-sm text-accent-bright">Connecting Spotify</h2>
         <p>
           If you connect Spotify, Earshot asks only for read access to your top artists, top tracks and recently
           played tracks. Your login tokens are kept in secure, http-only cookies in your browser and used only to
@@ -27,7 +28,7 @@ export default function PrivacyPage() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="font-display text-lg font-bold text-foreground">Everything else</h2>
+        <h2 className="caps text-sm text-accent-bright">Everything else</h2>
         <p>No accounts, no analytics, no ads, no tracking cookies.</p>
       </section>
     </article>

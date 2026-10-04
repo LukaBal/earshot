@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { Panel } from "@/components/ui";
+import { Panel, SectionTitle } from "@/components/ui";
 import {
   COOKIE,
   SpotifyError,
@@ -80,14 +80,13 @@ export default async function NowPage({ searchParams }: PageProps<"/now">) {
   const [me, artists, tracks, recent] = data;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm text-muted">Hey {me.display_name ?? "there"}, here&apos;s your</p>
-          <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">Current rotation</h1>
+          <SectionTitle as="h1" title="Right now" note={`What ${me.display_name ?? "you"} has had on repeat`} />
         </div>
         <form action="/api/auth/logout" method="post">
-          <button className="rounded-2xl border border-line px-4 py-2.5 text-sm text-muted transition-colors hover:text-foreground">
+          <button className="btn mb-5">
             Disconnect Spotify
           </button>
         </form>
@@ -99,8 +98,8 @@ export default async function NowPage({ searchParams }: PageProps<"/now">) {
             key={r}
             href={`/now?range=${r}`}
             aria-current={r === range ? "page" : undefined}
-            className={`rounded-full px-4 py-1.5 text-sm transition-colors ${
-              r === range ? "bg-foreground font-semibold text-black" : "border border-line text-muted hover:text-foreground"
+            className={`caps border px-3.5 py-1.5 text-[0.7rem] transition-colors duration-200 ${
+              r === range ? "border-accent bg-accent-deep/50 text-foreground" : "border-line text-muted hover:border-line-strong hover:text-foreground"
             }`}
           >
             {RANGES[r]}
@@ -110,7 +109,7 @@ export default async function NowPage({ searchParams }: PageProps<"/now">) {
 
       <Panel title="Top artists" aside={`last ${RANGES[range]}`}>
         {artists.items.length === 0 ? (
-          <p className="text-sm text-muted">Not enough listening in this range yet.</p>
+          <p className="text-sm italic text-muted">Not enough listening in this range yet.</p>
         ) : (
           <ol className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {artists.items.map((a, i) => {
@@ -118,15 +117,15 @@ export default async function NowPage({ searchParams }: PageProps<"/now">) {
               return (
                 <li key={a.id}>
                   <a href={a.external_urls.spotify} target="_blank" rel="noreferrer" className="group block">
-                    <div className="relative aspect-square overflow-hidden rounded-xl bg-panel-2">
+                    <div className="relative aspect-square overflow-hidden border border-line bg-panel-solid">
                       {img && (
-                        <Image src={img} alt="" fill sizes="(min-width: 1024px) 200px, 45vw" className="object-cover transition-transform group-hover:scale-105" />
+                        <Image src={img} alt="" fill sizes="(min-width: 1024px) 200px, 45vw" className="object-cover grayscale-[35%] transition duration-300 group-hover:scale-105 group-hover:grayscale-0" />
                       )}
-                      <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-xs font-semibold tabular-nums">
+                      <span className="absolute left-0 top-0 bg-[#05080a]/85 px-2 py-0.5 font-display text-base text-foreground tabular-nums">
                         {i + 1}
                       </span>
                     </div>
-                    <div className="mt-2 truncate font-medium group-hover:text-accent">{a.name}</div>
+                    <div className="mt-2 truncate text-foreground transition-colors group-hover:text-accent-bright">{a.name}</div>
                   </a>
                 </li>
               );
@@ -135,16 +134,16 @@ export default async function NowPage({ searchParams }: PageProps<"/now">) {
         )}
       </Panel>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <Panel title="Top tracks" aside={`last ${RANGES[range]}`}>
-          <ol className="space-y-1">
+          <ol className="divide-y divide-line">
             {tracks.items.map((t, i) => (
               <TrackRow key={t.id} track={t} lead={String(i + 1)} />
             ))}
           </ol>
         </Panel>
         <Panel title="Recently played">
-          <ol className="space-y-1">
+          <ol className="divide-y divide-line">
             {recent.items.map((item) => (
               <TrackRow
                 key={item.played_at}
@@ -172,17 +171,17 @@ function TrackRow({ track, lead, trailing }: { track: SpotifyTrack; lead?: strin
         href={track.external_urls.spotify}
         target="_blank"
         rel="noreferrer"
-        className="flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-panel-2"
+        className="flex items-center gap-3 py-2 transition-colors hover:bg-accent-deep/15"
       >
-        {lead && <span className="w-5 shrink-0 text-right text-sm tabular-nums text-muted">{lead}</span>}
-        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-panel-2">
+        {lead && <span className="w-6 shrink-0 text-right font-display text-lg tabular-nums text-muted">{lead}</span>}
+        <div className="relative h-10 w-10 shrink-0 overflow-hidden border border-line bg-panel-solid">
           {img && <Image src={img} alt="" fill sizes="40px" className="object-cover" />}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="truncate font-medium">{track.name}</div>
-          <div className="truncate text-sm text-muted">{track.artists.map((a) => a.name).join(", ")}</div>
+          <div className="truncate text-foreground">{track.name}</div>
+          <div className="truncate text-sm italic text-muted">{track.artists.map((a) => a.name).join(", ")}</div>
         </div>
-        {trailing && <span className="shrink-0 text-xs text-muted">{trailing}</span>}
+        {trailing && <span className="shrink-0 text-xs text-muted tabular-nums">{trailing}</span>}
       </a>
     </li>
   );
@@ -191,17 +190,17 @@ function TrackRow({ track, lead, trailing }: { track: SpotifyTrack; lead?: strin
 function ConnectScreen({ error, connected = false }: { error: string | null; connected?: boolean }) {
   const configured = clientId() !== null;
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">Current rotation</h1>
-        <p className="mt-3 text-muted">
+        <SectionTitle as="h1" title="Right now" note="Your current rotation, live from Spotify" />
+        <p className="leading-relaxed">
           Connect Spotify to see your top artists and tracks over the last 4 weeks, 6 months and year, plus your
           recent plays. Read-only: Earshot can&apos;t change anything in your account.
         </p>
         {configured && (
-          <p className="mt-3 text-sm text-muted">
+          <p className="mt-3 text-sm italic text-muted">
             Invite-only for now: Spotify only lets accounts the site owner has added log in. Everyone can use the{" "}
-            <Link href="/history" className="text-foreground underline underline-offset-4">
+            <Link href="/history" className="not-italic text-accent-bright underline decoration-accent/40 underline-offset-4">
               all-time dashboard
             </Link>
             .
@@ -209,23 +208,23 @@ function ConnectScreen({ error, connected = false }: { error: string | null; con
         )}
       </div>
 
-      {error && <p className="rounded-xl border border-accent-2/40 bg-accent-2/10 px-4 py-3 text-sm text-accent-2">{error}</p>}
+      {error && <p className="border border-[#d9927f]/40 border-l-2 border-l-[#d9927f] bg-[#d9927f]/5 px-4 py-3 text-sm text-[#e7b3a5]">{error}</p>}
 
       {configured ? (
         <div className="flex gap-3">
           {/* Plain <a>: this hits a route handler that redirects off-site, so no client-side navigation. */}
-          <a href="/api/auth/login" className="inline-block rounded-full bg-accent px-6 py-2.5 font-semibold text-black">
+          <a href="/api/auth/login" className="btn btn-primary">
             {connected ? "Reconnect Spotify" : "Connect Spotify"}
           </a>
           {connected && (
             <form action="/api/auth/logout" method="post">
-              <button className="rounded-full border border-line px-6 py-2.5 text-muted hover:text-foreground">Disconnect</button>
+              <button className="btn">Disconnect</button>
             </form>
           )}
         </div>
       ) : (
         <Panel title="One-time setup">
-          <ol className="list-decimal space-y-2 pl-5 text-muted">
+          <ol className="list-decimal space-y-2 pl-5 leading-relaxed marker:text-accent">
             <li>
               Create an app at <span className="text-foreground">developer.spotify.com/dashboard</span> and select{" "}
               <span className="text-foreground">Web API</span>.

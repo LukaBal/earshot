@@ -5,19 +5,20 @@ import { fmtHour, fmtMonth, fmtNum, msToHours } from "@/lib/format";
 
 // Recharts takes literal colors; keep in sync with globals.css.
 const C = {
-  accent: "#c6f24e",
-  accent2: "#ff7a59",
-  grid: "rgba(255,255,255,0.06)",
-  tick: "#8e8c96",
-  panel: "#1d1d24",
+  accent: "#52c7b0",
+  bone: "#e6e4dc",
+  dim: "#2f7f71",
+  grid: "rgba(170,205,200,0.08)",
+  tick: "#727a79",
+  panel: "#0c1214",
 };
 
-const axis = { stroke: C.tick, fontSize: 12, tickLine: false, axisLine: false } as const;
+const axis = { stroke: C.tick, fontSize: 12, fontFamily: "var(--font-body), Georgia, serif", tickLine: false, axisLine: false } as const;
 const tooltip = {
-  contentStyle: { background: C.panel, border: "1px solid rgba(255,255,255,0.16)", borderRadius: 10, fontSize: 13 },
-  labelStyle: { color: "#f3f1ea", fontWeight: 600 },
-  itemStyle: { color: "#f3f1ea" },
-  cursor: { fill: "rgba(255,255,255,0.04)" },
+  contentStyle: { background: C.panel, border: "1px solid rgba(82,199,176,0.45)", borderRadius: 0, fontSize: 13, fontFamily: "var(--font-body), Georgia, serif" },
+  labelStyle: { color: C.bone, fontWeight: 600 },
+  itemStyle: { color: C.bone },
+  cursor: { fill: "rgba(170,205,200,0.05)" },
 };
 const hoursLabel = (v: unknown) => [`${fmtNum(Math.round(Number(v)))} h`, "Listened"] as [string, string];
 
@@ -29,7 +30,7 @@ export function MonthChart({ data }: { data: { month: string; ms: number }[] }) 
         <AreaChart data={rows} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
           <defs>
             <linearGradient id="monthFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={C.accent} stopOpacity={0.35} />
+              <stop offset="0%" stopColor={C.accent} stopOpacity={0.28} />
               <stop offset="100%" stopColor={C.accent} stopOpacity={0} />
             </linearGradient>
           </defs>
@@ -37,7 +38,7 @@ export function MonthChart({ data }: { data: { month: string; ms: number }[] }) 
           <XAxis dataKey="month" tickFormatter={fmtMonth} minTickGap={24} {...axis} />
           <YAxis tickFormatter={(v) => `${v}h`} width={48} {...axis} />
           <Tooltip {...tooltip} labelFormatter={(l) => fmtMonth(String(l))} formatter={hoursLabel} />
-          <Area type="monotone" dataKey="hours" stroke={C.accent} strokeWidth={2} fill="url(#monthFill)" />
+          <Area type="monotone" dataKey="hours" stroke={C.accent} strokeWidth={1.5} fill="url(#monthFill)" />
         </AreaChart>
       </ResponsiveContainer>
     </div>
@@ -57,15 +58,14 @@ export function HourChart({ data }: { data: { hour: number; ms: number }[] }) {
           <Tooltip {...tooltip} labelFormatter={(l) => `${fmtHour(Number(l))}–${fmtHour((Number(l) + 1) % 24)}`} formatter={hoursLabel} />
           <Bar
             dataKey="hours"
-            radius={[4, 4, 0, 0]}
             shape={(props: { x?: number; y?: number; width?: number; height?: number; payload?: { hour: number } }) => (
               <rect
                 x={props.x}
                 y={props.y}
                 width={props.width}
                 height={props.height}
-                rx={3}
-                fill={props.payload?.hour === peak?.hour ? C.accent2 : C.accent}
+                fill={props.payload?.hour === peak?.hour ? C.bone : C.accent}
+                fillOpacity={props.payload?.hour === peak?.hour ? 0.9 : 0.75}
               />
             )}
           />
@@ -85,7 +85,7 @@ export function WeekdayChart({ data }: { data: { day: string; ms: number }[] }) 
           <XAxis dataKey="day" {...axis} />
           <YAxis tickFormatter={(v) => `${v}h`} width={48} {...axis} />
           <Tooltip {...tooltip} formatter={hoursLabel} />
-          <Bar dataKey="hours" fill={C.accent} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="hours" fill={C.accent} fillOpacity={0.75} maxBarSize={36} />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -108,16 +108,16 @@ export function YearChart({ data }: { data: { year: string; ms: number; topArtis
               if (!active || !row) return null;
               return (
                 <div style={tooltip.contentStyle} className="px-3 py-2">
-                  <div className="font-semibold">{row.year}</div>
+                  <div className="caps text-xs text-foreground">{row.year}</div>
                   <div>{fmtNum(Math.round(row.hours))} h listened</div>
                   <div className="text-muted">
-                    #1: <span className="text-accent">{row.topArtist}</span>
+                    #1 <span className="italic text-accent-bright">{row.topArtist}</span>
                   </div>
                 </div>
               );
             }}
           />
-          <Bar dataKey="hours" fill={C.accent2} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="hours" fill={C.dim} activeBar={{ fill: C.accent }} maxBarSize={48} />
         </BarChart>
       </ResponsiveContainer>
     </div>

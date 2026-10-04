@@ -1,77 +1,110 @@
 import Link from "next/link";
+import { SectionTitle } from "@/components/ui";
 import { clientId } from "@/lib/spotify";
+
+const FEATURES = [
+  {
+    title: "Year by year",
+    body: "Hours listened for every year since you joined, and the artist who owned each one.",
+  },
+  {
+    title: "All-time rankings",
+    body: "Your top artists by time actually spent, and your top tracks by how often you came back to them.",
+  },
+  {
+    title: "When you listen",
+    body: "By hour and by weekday, so you can see the commute, the late nights and the Sunday mornings.",
+  },
+  {
+    title: "Skip habits",
+    body: "How often you bail on a track before it ends. The extended export records every skip.",
+  },
+];
 
 export default function Home() {
   const live = clientId() !== null;
+
   return (
-    <div className="space-y-14">
-      <section className="max-w-3xl pt-4 sm:pt-10">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-accent">Spotify stats, unwrapped</p>
-        <h1 className="mt-4 font-display text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-7xl">
-          Everything you&apos;ve ever played.
+    <div className="space-y-24 sm:space-y-32">
+      <section className="flex min-h-[70dvh] flex-col items-center justify-center text-center">
+        <h1 className="font-display text-6xl font-medium uppercase tracking-[0.16em] text-foreground sm:text-8xl">
+          Earshot
         </h1>
-        <p className="mt-6 max-w-xl text-lg text-muted">
-          Wrapped shows you one year, once a year. Earshot reads your full listening history: every artist, every
-          late-night loop, every year since you signed up.
+        <p className="caps mt-5 text-lg tracking-[0.4em] text-accent sm:text-xl">Listening archive</p>
+        <p className="caps mt-6 text-xs tracking-[0.3em] text-accent/70">Your full Spotify history · read in your browser</p>
+        <p className="mt-8 max-w-[34rem] text-pretty leading-relaxed">
+          Wrapped gives you one year, once a year. Earshot reads the export Spotify keeps on you: every play since you
+          signed up, broken down by year, by hour and by artist.
         </p>
+        <div className="mt-10 flex flex-wrap justify-center gap-3">
+          <Link href="/history" className="btn btn-primary">
+            Open the archive
+          </Link>
+          <Link href="#export" className="btn">
+            Get your data
+          </Link>
+          {live && (
+            <Link href="/now" className="btn">
+              Right now
+            </Link>
+          )}
+        </div>
+        <a href="#about" className="caps mt-20 text-[0.6rem] tracking-[0.3em] text-muted transition-colors hover:text-foreground">
+          Scroll ↓
+        </a>
       </section>
 
-      <section className={`grid gap-4 ${live ? "md:grid-cols-2" : ""}`}>
-        <Link
-          href="/history"
-          className="group rounded-2xl border border-line bg-panel p-6 transition-colors hover:border-accent/60 sm:p-8"
-        >
-          <div className="text-sm font-medium text-accent">All-time</div>
-          <h2 className="mt-2 font-display text-2xl font-bold tracking-tight">Your full history</h2>
-          <p className="mt-2 text-muted">
-            Drop in your Spotify data export and get hours per year, top artists of all time, when you listen, and
-            how your taste changed.
+      <section id="about" className="grid scroll-mt-24 gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-14">
+        <div>
+          <SectionTitle title="What it shows" note="From a single folder of JSON files" />
+          <p className="max-w-md leading-relaxed">
+            Spotify&apos;s extended streaming history logs every track you&apos;ve played: when it ended, how long you
+            listened, and whether you skipped. Earshot turns that into something you can actually read.
           </p>
-          <span className="mt-6 inline-block font-medium group-hover:text-accent">Open dashboard →</span>
-        </Link>
-        {live && (
-        <Link
-          href="/now"
-          className="group rounded-2xl border border-line bg-panel p-6 transition-colors hover:border-accent-2/60 sm:p-8"
-        >
-          <div className="text-sm font-medium text-accent-2">Right now · invite-only</div>
-          <h2 className="mt-2 font-display text-2xl font-bold tracking-tight">Your current rotation</h2>
-          <p className="mt-2 text-muted">
-            Connect Spotify for your top artists and tracks over the last 4 weeks, 6 months and year, plus what you
-            just played.
-          </p>
-          <span className="mt-6 inline-block font-medium group-hover:text-accent-2">Connect →</span>
-        </Link>
-        )}
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {FEATURES.map((f) => (
+            <article key={f.title} className="card p-5">
+              <h3 className="caps text-xs text-accent-bright">{f.title}</h3>
+              <p className="mt-3 text-[0.95rem] leading-relaxed">{f.body}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
-      <section className="rounded-2xl border border-line p-6 sm:p-8">
-        <h2 className="font-display text-xl font-bold tracking-tight">Getting your data export</h2>
-        <ol className="mt-4 grid gap-4 text-muted sm:grid-cols-3">
-          <Step n={1}>
-            Go to <span className="text-foreground">spotify.com → Account → Privacy settings</span>.
+      <section id="export" className="scroll-mt-24">
+        <SectionTitle title="Your data" note="Request it once, keep it forever" />
+        <ol className="max-w-3xl divide-y divide-line border-y border-line">
+          <Step n="I">
+            On spotify.com, open <span className="text-foreground">Account → Privacy settings</span>.
           </Step>
-          <Step n={2}>
-            Tick <span className="text-foreground">Extended streaming history</span> and request it. The basic
-            account data works too, but only covers the last year.
+          <Step n="II">
+            Tick <span className="text-foreground">Extended streaming history</span> and request it. The basic account
+            data works too, but only covers the last year.
           </Step>
-          <Step n={3}>
-            Spotify emails a zip within a few days (sometimes up to 30). Unzip it and drop the{" "}
-            <code className="text-foreground">Streaming_History_Audio_*.json</code> files in.
+          <Step n="III">
+            Spotify emails a zip within a few days, sometimes up to thirty. Unzip it and drop the{" "}
+            <code className="text-foreground">Streaming_History_Audio_*.json</code> files into{" "}
+            <Link href="/history" className="text-accent-bright underline decoration-accent/40 underline-offset-4 hover:decoration-accent">
+              the archive
+            </Link>
+            .
           </Step>
         </ol>
+        <p className="mt-6 max-w-3xl text-sm">
+          <span className="text-foreground">Note:</span> your files never leave your device. They&apos;re read and stored
+          by your own browser. See <Link href="/privacy" className="italic text-foreground hover:text-accent-bright">privacy</Link>.
+        </p>
       </section>
     </div>
   );
 }
 
-function Step({ n, children }: { n: number; children: React.ReactNode }) {
+function Step({ n, children }: { n: string; children: React.ReactNode }) {
   return (
-    <li className="flex gap-3">
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-panel-2 font-display text-sm font-bold text-foreground">
-        {n}
-      </span>
-      <p>{children}</p>
+    <li className="grid grid-cols-[3rem_1fr] items-baseline gap-4 py-5">
+      <span className="font-display text-2xl text-accent">{n}</span>
+      <p className="leading-relaxed">{children}</p>
     </li>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { HourChart, MonthChart, WeekdayChart, YearChart } from "@/components/Charts";
-import { Panel, RankList, StatTile } from "@/components/ui";
+import { Panel, RankList, SectionTitle, StatTile } from "@/components/ui";
 import { fmtDate, fmtDuration, fmtHour, fmtNum } from "@/lib/format";
 import { computeStats, mergePlays, parseExport, yearlyOverview, yearsIn, type Play } from "@/lib/history";
 import { clearPlays, loadPlays, savePlays } from "@/lib/store";
@@ -64,16 +64,17 @@ export function HistoryDashboard() {
   }
 
   if (plays === null) {
-    return <div className="h-64 animate-pulse rounded-2xl bg-panel" aria-label="Loading" />;
+    return <div className="card h-64 animate-pulse" aria-label="Loading" />;
   }
 
   if (plays.length === 0) {
     return (
-      <div className="mx-auto max-w-3xl space-y-6">
+      <div className="max-w-3xl space-y-6">
         <div>
-          <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">Your full history</h1>
-          <p className="mt-3 text-muted">
-            Files are read in your browser and stored only on this device. Nothing gets uploaded anywhere.
+          <SectionTitle as="h1" title="The archive" note="Files are read by your browser and stay on this device" />
+          <p className="max-w-xl leading-relaxed">
+            Add the streaming history files from your Spotify export. Select every file in the folder at once; Earshot
+            merges them and ignores duplicates.
           </p>
         </div>
         <Dropzone onFiles={handleFiles} busy={busy} />
@@ -86,23 +87,18 @@ export function HistoryDashboard() {
   const peakDay = stats.byWeekday.reduce((a, b) => (b.ms > a.ms ? b : a));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
-            {year === null ? "All-time" : year}
-          </h1>
-          {stats.first !== null && stats.last !== null && (
-            <p className="mt-2 text-muted">
-              {fmtDate(stats.first)} – {fmtDate(stats.last)}
-            </p>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
+        <SectionTitle
+          as="h1"
+          title={year === null ? "All-time" : String(year)}
+          note={stats.first !== null && stats.last !== null ? `${fmtDate(stats.first)} – ${fmtDate(stats.last)}` : undefined}
+        />
+        <div className="mb-5 flex items-center gap-2">
           <Dropzone onFiles={handleFiles} busy={busy} compact />
           <button
             onClick={handleClear}
-            className="rounded-2xl border border-line px-4 py-2.5 text-sm text-muted transition-colors hover:border-accent-2/60 hover:text-accent-2"
+            className="btn"
           >
             Clear data
           </button>
@@ -111,7 +107,7 @@ export function HistoryDashboard() {
 
       <NoticeList notices={notices} />
 
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0" role="tablist" aria-label="Year">
+      <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:px-0" role="tablist" aria-label="Year">
         <YearChip active={year === null} onClick={() => setYear(null)}>
           All time
         </YearChip>
@@ -138,7 +134,7 @@ export function HistoryDashboard() {
         <MonthChart data={stats.byMonth} />
       </Panel>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <Panel title="Time of day" aside={`peak ${fmtHour(peakHour.hour)}–${fmtHour((peakHour.hour + 1) % 24)}`}>
           <HourChart data={stats.byHour} />
         </Panel>
@@ -153,7 +149,7 @@ export function HistoryDashboard() {
         </Panel>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <Panel title="Top artists" aside="by time listened">
           <RankList
             items={stats.topArtists.map((a) => ({
@@ -187,8 +183,8 @@ function YearChip({ active, onClick, children }: { active: boolean; onClick: () 
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`shrink-0 rounded-full px-4 py-1.5 text-sm tabular-nums transition-colors ${
-        active ? "bg-foreground font-semibold text-black" : "border border-line text-muted hover:text-foreground"
+      className={`caps shrink-0 border px-3.5 py-1.5 text-[0.7rem] tabular-nums transition-colors duration-200 ${
+        active ? "border-accent bg-accent-deep/50 text-foreground" : "border-line text-muted hover:border-line-strong hover:text-foreground"
       }`}
     >
       {children}
@@ -201,7 +197,7 @@ function NoticeList({ notices }: { notices: Notice[] }) {
   return (
     <ul className="space-y-1 text-sm" aria-live="polite">
       {notices.map((n, i) => (
-        <li key={i} className={n.kind === "ok" ? "text-accent" : "text-accent-2"}>
+        <li key={i} className={n.kind === "ok" ? "text-accent-bright" : "text-[#d9927f]"}>
           {n.text}
         </li>
       ))}

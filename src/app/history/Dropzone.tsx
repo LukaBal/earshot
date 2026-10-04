@@ -17,9 +17,13 @@ export function Dropzone({ onFiles, busy, compact = false }: { onFiles: (files: 
         setDragging(false);
         onFiles([...e.dataTransfer.files]);
       }}
-      className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed text-center transition-colors ${
-        dragging ? "border-accent bg-accent/5" : "border-line-strong hover:border-accent/60"
-      } ${compact ? "px-4 py-2.5 text-sm" : "px-6 py-16"} ${busy ? "pointer-events-none opacity-60" : ""}`}
+      className={`${
+        compact
+          ? "btn btn-primary cursor-pointer"
+          : `card flex cursor-pointer flex-col items-center justify-center border-dashed px-6 py-16 text-center transition-colors duration-200 ${
+              dragging ? "border-accent bg-accent-deep/20" : "hover:border-line-strong"
+            }`
+      } ${busy ? "pointer-events-none opacity-60" : ""}`}
     >
       <input
         type="file"
@@ -32,17 +36,17 @@ export function Dropzone({ onFiles, busy, compact = false }: { onFiles: (files: 
         }}
       />
       {compact ? (
-        <span className="font-medium">{busy ? "Reading…" : "+ Add files"}</span>
+        <span>{busy ? "Reading…" : "Add files"}</span>
       ) : (
         <>
-          <span className="font-display text-2xl font-bold tracking-tight">
+          <span className="font-display text-3xl font-medium text-foreground">
             {busy ? "Reading your history…" : "Drop your streaming history here"}
           </span>
-          <span className="mt-2 text-muted">
+          <span className="mt-3 text-sm text-muted">
             <code className="text-foreground">Streaming_History_Audio_*.json</code> or{" "}
             <code className="text-foreground">StreamingHistory_music_*.json</code>. Select them all at once.
           </span>
-          <span className="mt-6 rounded-full bg-accent px-5 py-2 font-semibold text-black">Choose files</span>
+          <span className="btn btn-primary mt-8">Choose files</span>
         </>
       )}
     </label>
